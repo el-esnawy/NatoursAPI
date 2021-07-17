@@ -1,77 +1,26 @@
 const fs = require("fs");
 
-// TO parse it to JS Object
-const tours = JSON.parse(
-  fs.readFileSync(
-    `C:/Users/meles/Music/Desktop/Web Development/Projects/In-Progress Projects/Natours API/dev-data/data/tours-simple.json`
-  )
-);
+const Tour = require("../Model/tourModel");
 
 // ROUTE HANDLERS
 
-exports.checkID = (req, res, next, val) => {
-  const id = val * 1;
-  const tour = tours.find((el) => el.id === id);
+exports.getAllTours = (req, res) => {};
 
-  if (id > tours.length || !tour) {
-    return res.status(404).json({
-      status: "Fail",
-      message: "Invalid ID ",
-    });
-  }
-  req.tour = tour;
-  next();
-};
-
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name || !req.body.price) {
-    return res.status(400).json({
-      status: "error",
-      message: "A Tour must have a name and price",
-    });
-  }
-  next();
-};
-
-exports.getAllTours = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    requestAt: req.requestTime,
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-};
-
-exports.getTourByID = (req, res) => {
-  const { tour } = req;
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-};
+exports.getTourByID = (req, res) => {};
 
 exports.createTour = (req, res) => {
-  const newID = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newID }, req.body);
-  tours.push(newTour);
-  fs.writeFile(
-    `C:/Users/meles/Music/Desktop/Web Development/Projects/In-Progress Projects/Natours API/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      // 201 stands for created
-      res.status(201).json({
-        status: "success",
-        data: {
-          tour: newTour,
-        },
-      });
-      console.log(err);
-    }
-  );
+  // creates a new Tour on the mdoel used
+  //calls the save on the new Tour
+  // const newTour = new Tour({});
+  // newTour.save()
+
+  //ALTERNATIVE ON THE ABOVE
+  //calls the save on the document instead
+  //Tour.create({})
+
+  res.status(200).json({
+    status: "success",
+  });
 };
 
 exports.updateTourByID = (req, res) => {

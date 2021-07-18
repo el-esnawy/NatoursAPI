@@ -1,8 +1,13 @@
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const chalk = require("chalk");
-const mongoose = require("mongoose");
 
 dotenv.config({ path: "./config.env" });
+
+//app needs to run after the dotenv otherwise it will not read the env var
+const app = require("./app");
+
+const port = process.env.PORT || 3000;
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
@@ -20,10 +25,9 @@ mongoose
     console.log(chalk.blackBright.bgGreen.bold("DB Connection Successfull"));
   });
 
-//app needs to run after the dotenv otherwise it will not read the env var
-const app = require("./app");
+// makes sure to return new updated document and not the original
+// mongoose.set("returnOriginal", false);
 
-const port = process.env.PORT || 3000;
 // START THE SERVER
 app.listen(port, () => {
   console.log(`App is running on Port: ${port}`);

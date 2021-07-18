@@ -126,6 +126,17 @@ exports.deleteTourByID = async (req, res) => {
   }
 };
 
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = Tour.aggregate([]);
+  } catch (error) {
+    res.status(500).json({
+      status: "Error",
+      message: error.message,
+    });
+  }
+};
+
 /// ALTERNATIVE TO THE CLASS APIFEATURES
 
 // build the query

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const chalk = require("chalk");
+const dotenv = require("dotenv");
 
 dotenv.config({ path: "./config.env" });
 
@@ -29,6 +29,7 @@ mongoose
 // mongoose.set("returnOriginal", false);
 
 // START THE SERVER
+
 app.listen(port, () => {
   console.log(`App is running on Port: ${port}`);
 });

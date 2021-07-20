@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const chalk = require("chalk");
 const dotenv = require("dotenv");
 
+process.on("uncaughtException", (err) => {
+  console.log("UNHANDLER EXCEPTION...SHUTTING DOWN...", err);
+  process.exit(1);
+});
+
 dotenv.config({ path: "./config.env" });
 
 //app needs to run after the dotenv otherwise it will not read the env var
@@ -30,6 +35,16 @@ mongoose
 
 // START THE SERVER
 
-app.listen(port, () => {
-  console.log(`App is running on Port: ${port}`);
+const server = app.listen(port, () => {
+  console.log(chalk.blackBright.bgWhite(`App is running on Port: ${port}`));
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log(err);
+  console.log("UNHANDLER REJECTION...SHUTTING DOWN...");
+
+  // smoother than process.exit(1)
+  server.close(() => {
+    process.exit(1);
+  });
 });

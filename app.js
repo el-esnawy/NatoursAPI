@@ -1,6 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
 
+const globalErrorHandler = require("./API/Controllers/errorController");
+const AppError = require("./API/utils/appError");
 const tourRouter = require("./API/Routes/tourRoutes");
 const userRouter = require("./API/Routes/userRoutes");
 
@@ -26,6 +28,22 @@ app.use((req, res, next) => {
 // ALL ROUTES
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't Find ${req.originalUrl} on this Server!`, 404));
+
+  // res.status(404).json({
+  //   status: "Fail",
+  //   message: `Can't find ${req.originalUrl} on this server!`,
+  // });
+  // const error = new Error("Route not available");
+  // error.status = "fail";
+  // error.statusCode = 404;
+  // next(error);
+});
+
+// middleware to handle error, will have 4 inputs and express will recognize it // as an error handling middleware
+
+app.use(globalErrorHandler);
 
 module.exports = app;
 

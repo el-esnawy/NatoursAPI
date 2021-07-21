@@ -28,7 +28,7 @@ const schemaOfTheTours = {
   },
   maxGroupSize: {
     type: Number,
-    require: [true, "A Tour must have a maximum group size"],
+    required: [true, "A Tour must have a maximum group size"],
   },
   difficulty: {
     type: String,

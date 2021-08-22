@@ -87,13 +87,42 @@ const schemaOfTheTours = {
     type: Boolean,
     default: false,
   },
+  startLocation: {
+    // GeoJSON
+    type: {
+      type: String,
+      default: "Point",
+      enum: ["Point"],
+    },
+    coordinates: [Number], // longitude first and latitude second
+    address: String,
+    description: String,
+  },
+  locations: [
+    {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+      day: Number,
+    },
+  ],
+  guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
 };
 
 const tourSchema = new mongoose.Schema(schemaOfTheTours, {
   toJSON: {
     virtuals: true,
   },
+  toObject: { virtuals: true },
 });
+
+// setting an index to speed up query
+tourSchema.index({ price: 1, slug: 1 });
 
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
@@ -107,6 +136,13 @@ tourSchema.pre("save", function (next) {
   next();
 });
 
+// embedding the documents
+// tourSchema.pre("save", async function (next) {
+//   const guidesPromises = this.guides.map((id) => User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
 // eslint-disable-next-line prefer-arrow-callback
 tourSchema.post("save", function (doc, next) {
   // console.log(doc); // return current document saved
@@ -119,6 +155,22 @@ tourSchema.post("save", function (doc, next) {
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+// virtual populate
+tourSchema.virtual("reviews", {
+  ref: "Reviews",
+  foreignField: "tour",
+  localField: "_id",
+});
+
+// populating all the documents
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
   next();
 });
 

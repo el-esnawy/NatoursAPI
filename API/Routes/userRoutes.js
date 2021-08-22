@@ -9,24 +9,22 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.post("/forgotpassword", authController.forgotPassword);
 router.patch("/resetpassword/:token", authController.resetPassword);
+
+router.use(authController.protect);
+
 router.patch(
   "/updateMyPassword",
   authController.protect,
   authController.updatePassword
 );
-router.delete("/deleteMe", authController.protect, userController.deleteMe);
+router.delete("/deleteMe", userController.deleteMe);
 
-router.patch("/updateMe", authController.protect, userController.updateMe);
+router.patch("/updateMe", userController.updateMe);
 
-router
-  .route("/")
-  .get(
-    authController.protect,
-    authController.authorize("admin"),
-    userController.getAllUsers
-  )
-  .post(userController.createUser);
+router.get("/me", userController.getMe, userController.getUserByID);
 
+router.use(authController.authorize("admin"));
+router.route("/").get(userController.getAllUsers);
 router
   .route("/:id")
   .get(userController.getUserByID)

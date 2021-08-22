@@ -1,8 +1,14 @@
 const Tour = require("../Models/tourModel");
 
-const APIFeatures = require("../utils/apiFeatures");
-const AppError = require("../utils/appError");
+const factory = require("./handlerFactory");
+
 const catchAsync = require("../utils/catchAsync");
+
+exports.getAllTours = factory.getAll(Tour);
+exports.updateTourById = factory.updateOne(Tour);
+exports.deleteTourByID = factory.deleteOne(Tour);
+exports.createTour = factory.createOne(Tour);
+exports.getTourByID = factory.getOne(Tour, { path: "reviews" });
 
 exports.aliasTopTours = catchAsync(async (req, res, next) => {
   req.query = {
@@ -11,86 +17,6 @@ exports.aliasTopTours = catchAsync(async (req, res, next) => {
     fields: req.query.fields || "name,price,ratingsAverage,summary,difficulty",
   };
   next();
-});
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  const tourFeatures = new APIFeatures(Tour, req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const allTours = await tourFeatures.query;
-
-  if (allTours.length === 0) throw new Error("This Page does not Exist");
-
-  res.status(200).json({
-    status: "success",
-    results: allTours.length,
-    data: {
-      tours: allTours,
-    },
-  });
-});
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour: newTour,
-    },
-  });
-});
-exports.getTourByID = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-  //SAME METHOD AS ABOVE
-  // const tour = await Tour.findOne({ _id: req.params.id });
-
-  if (!tour) return next(new AppError("No Tour Found with that ID", 404));
-
-  // const NoTourFound = new Error("No Tour Found");
-  // NoTourFound.statusCode = 404;
-  // if (!tour) return next(NoTourFound);
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
-exports.updateTourByID = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    //to return the new document
-    new: true,
-    runValidators: true,
-  });
-
-  // SAME AS ABOVE
-  // const tour = await Tour.findOneAndUpdate(
-  //   { _id: req.params.id },
-  //   req.body,
-  //   {
-  //     new: true,
-  //     runValidators: true,
-  //   }
-  // );
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
-exports.deleteTourByID = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  if (!tour) return next(new AppError("No Tour Found", 404));
-  res.status(204).json({
-    status: "succes",
-    data: {
-      tour,
-    },
-  });
 });
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
@@ -161,6 +87,50 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     data: { plan },
   });
 });
+
+// exports.deleteTourByID = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndDelete(req.params.id);
+//   if (!tour) return next(new AppError("No Tour Found", 404));
+//   res.status(204).json({
+//     status: "succes",
+//     data: {
+//       tour,
+//     },
+//   });
+// });
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   const newTour = await Tour.create(req.body);
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       tour: newTour,
+//     },
+//   });
+// });
+// exports.updateTourByID = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//     //to return the new document
+//     new: true,
+//     runValidators: true,
+//   });
+
+//   // SAME AS ABOVE
+//   // const tour = await Tour.findOneAndUpdate(
+//   //   { _id: req.params.id },
+//   //   req.body,
+//   //   {
+//   //     new: true,
+//   //     runValidators: true,
+//   //   }
+//   // );
+
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       tour,
+//     },
+//   });
+// });
 
 /// ALTERNATIVE TO THE CLASS APIFEATURES
 

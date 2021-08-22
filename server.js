@@ -36,7 +36,9 @@ mongoose
 // START THE SERVER
 
 const server = app.listen(port, () => {
-  console.log(chalk.blackBright.bgWhite(`App is running on Port: ${port}`));
+  if (process.env.NODE_ENV === "development") {
+    console.log(chalk.blackBright.bgWhite(`App is running on Port: ${port}`));
+  }
 });
 
 process.on("unhandledRejection", (err) => {

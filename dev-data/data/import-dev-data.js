@@ -3,7 +3,9 @@ const dotenv = require("dotenv");
 const chalk = require("chalk");
 const mongoose = require("mongoose");
 
-const Tour = require("../../API/Model/tourModel");
+const Tour = require("../../API/Models/tourModel");
+const User = require("../../API/Models/userModel");
+const Review = require("../../API/Models/reviewModel");
 
 dotenv.config({ path: "./config.env" });
 
@@ -27,17 +29,20 @@ mongoose
 
 const tour = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
 
-// const reviews = JSON.parse(
-//   fs.readFileSync(`${__dirname}/reviews.json`, "utf-8")
-// );
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, "utf-8")
+);
 
-// const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, "utf-8"));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, "utf-8"));
 
 // IMPORT DATA INTO DB
 
 const importData = async () => {
   try {
+    await User.create(users, { validateBeforeSave: false });
     await Tour.create(tour);
+    await Review.create(reviews);
+
     console.log(chalk.bgBlueBright("Data Successfully Loaded"));
   } catch (error) {
     console.log(error);
@@ -49,6 +54,8 @@ const importData = async () => {
 const deleteAllData = async () => {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
     console.log(chalk.bgRed("Data Successfully Deleted"));
   } catch (error) {
     console.log(error);
